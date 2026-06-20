@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login - Generic School</title>
+<link rel="stylesheet" href="adminlogin.css">
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+
+<header>
+    <div class="logo-container">
+        <img src="school-logo.png" alt="School Logo">
+        <a href="index.html" class="logo-text">
+            <h1>Generic School</h1>
+            <small>Generic School Name or Generic Description</small>
+        </a>
+    </div>
+    <nav>
+        <a href="history.html">About</a>
+        <a href="enroll.html" class="enroll-btn">Enroll</a>
+        <a href="loginpage.html">Log In</a>
+    </nav>
+</header>
+
+<section class="hero">
+
+    <div class="welcome-text">
+        <h2>ADMIN PORTAL</h2>
+        <p>Authorized personnel only</p>
+    </div>
+
+    <div class="login-box" id="loginForm">
+        <div class="input-group">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Enter username" autocomplete="off">
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter password">
+        </div>
+
+        <label class="remember-me">
+            <input type="checkbox" id="rememberMe">
+            Remember me
+        </label>
+
+        <button class="login-btn" id="loginBtn" disabled>LOG IN</button>
+    </div>
+
+    <div class="modal-overlay" id="errorModal">
+        <div class="thankyou-box error-box">
+            <h2>Access Denied</h2>
+            <p id="errorMessage">Invalid username or password.</p>
+            <button class="ok-btn" id="errorOkBtn">OK</button>
+        </div>
+    </div>
+
+</section>
+
+<script src="adminlogin.js"></script>
+</body>
+</html>

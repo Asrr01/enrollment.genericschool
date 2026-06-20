@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generic School - Admin Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="adminpage.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">🏫</div>
+            <div class="school-name">
+                <h1>Generic School</h1>
+                <p>Generic School Name or Generic Description</p>
+            </div>
+        </div>
+        <div class="page-title">ADMINS PAGE</div>
+        <div class="header-actions">
+            <button class="filter-btn" id="filterBtn">FILTER</button>
+            <button class="search-icon" id="searchBtn">🔍</button>
+            <button class="back-btn" id="backBtn" style="display: none;">↩</button>
+        </div>
+    </header>
+
+    <!-- Grid View -->
+    <div class="grid-container" id="gridView">
+        <div class="grid-header" id="gridHeader">
+            <span class="results-count" id="resultsCount">Showing all 18 students</span>
+            <button class="clear-filters-btn" id="clearFiltersBtn" style="display: none;">Clear Filters ✕</button>
+        </div>
+        <div class="students-grid" id="studentsGrid"></div>
+    </div>
+
+    <!-- Detail View -->
+    <div class="detail-container" id="detailView">
+        <div class="detail-card">
+            <div class="detail-header">
+                <div class="detail-info-left">
+                    <p><span class="label">ID NUM:</span> <span id="detailId">1</span></p>
+                    <p><span class="label">Name:</span> <span id="detailName">Suffix + Full Name</span></p>
+                    <p><span class="label">Sex:</span> <span id="detailSex">M</span></p>
+                    <p><span class="label">Student Status:</span> <span id="detailStatus">Enrolling</span></p>
+                    <p>
+                        <span class="label">Grade Level:</span>
+                        <span id="detailGrade">Kinder</span>
+                        <select id="detailGradeSelect" style="display: none;">
+                            <option>Kinder</option>
+                            <option>Grade 1</option>
+                            <option>Grade 2</option>
+                            <option>Grade 3</option>
+                            <option>Grade 4</option>
+                            <option>Grade 5</option>
+                            <option>Grade 6</option>
+                        </select>
+                    </p>
+                </div>
+                <div class="detail-date">
+                    <div class="date-label">DATE</div>
+                    <div class="date-value" id="detailDate">06/19/2026</div>
+                </div>
+            </div>
+            
+            <div class="detail-body">
+                <div class="documents-section">
+                    <div class="doc-item">
+                        <div class="doc-label">BIRTH CERT</div>
+                        <a href="#" class="doc-link" id="birthCertLink">
+                            <span class="doc-icon">🖼️</span>
+                            <span>LNSN_BIRTH CERT</span>
+                        </a>
+                    </div>
+                    <div class="doc-item">
+                        <div class="doc-label">SF9</div>
+                        <a href="#" class="doc-link" id="sf9Link">
+                            <span class="doc-icon">🖼️</span>
+                            <span>LNSN_SF9</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="status-section">
+                    <div class="status-title">STATUS</div>
+                    <div class="status-box">
+                        <label class="radio-option">
+                            <input type="radio" name="phase" value="first">
+                            <span>First Phase</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="phase" value="second">
+                            <span>Second Phase</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="phase" value="third">
+                            <span>Third Phase</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="phase" value="fourth">
+                            <span>Fourth Phase</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="enrolled-section">
+                    <div class="enrolled-title">ENROLLED / FIFTH PHASE</div>
+                    <div class="enrolled-box" id="enrolledBox">
+                        <div class="enrolled-item">
+                            <span id="enrolledSectionText">SECTION: MAGSAYSAY</span>
+                            <input type="text" id="enrolledSectionInput" style="display: none;" placeholder="Section Name">
+                        </div>
+                        <div class="enrolled-item" id="teacherItem">
+                            <span id="teacherPrefixText">MS.</span>
+                            <span id="teacherNameText">BONIFACIO</span>
+                            <select id="teacherPrefixSelect" style="display: none;">
+                                <option>MS.</option>
+                                <option>MR.</option>
+                                <option>MRS.</option>
+                            </select>
+                            <input type="text" id="teacherNameInput" style="display: none;" placeholder="Last Name">
+                        </div>
+                        <div class="enrolled-item">
+                            <span id="enrolledScheduleText">8AM-2PM M-F</span>
+                            <input type="text" id="enrolledScheduleInput" style="display: none;" placeholder="e.g. 8AM-2PM M-F">
+                        </div>
+                        <div class="enrolled-item">
+                            <span id="classPeriodText">AM CLASS</span>
+                            <select id="classPeriodSelect" style="display: none;">
+                                <option>AM CLASS</option>
+                                <option>PM CLASS</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="edit-btn" id="editBtn">EDIT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Popup Overlay -->
+    <div class="search-overlay" id="searchOverlay">
+        <div class="search-modal">
+            <button class="search-close" id="searchClose">✕</button>
+            <div class="search-header">
+                <h2>Search Students</h2>
+            </div>
+            <div class="search-input-wrapper">
+                <input type="text" class="search-input" id="searchInput" placeholder="Enter name, LRN, or ID number...">
+                <button class="search-submit" id="searchSubmit">🔍</button>
+            </div>
+            <div class="search-filters">
+                <span class="filter-chip active" data-filter="all">All</span>
+                <span class="filter-chip" data-filter="enrolling">Enrolling</span>
+                <span class="filter-chip" data-filter="enrolled">Enrolled</span>
+                <span class="filter-chip" data-filter="kinder">Kinder</span>
+                <span class="filter-chip" data-filter="grade1">Grade 1</span>
+                <span class="filter-chip" data-filter="grade2">Grade 2</span>
+                <span class="filter-chip" data-filter="grade3">Grade 3</span>
+                <span class="filter-chip" data-filter="grade4">Grade 4</span>
+                <span class="filter-chip" data-filter="grade5">Grade 5</span>
+                <span class="filter-chip" data-filter="grade6">Grade 6</span>
+            </div>
+            <div class="search-results" id="searchResults"></div>
+        </div>
+    </div>
+
+    <!-- Filter Popup Overlay -->
+    <div class="filter-overlay" id="filterOverlay">
+        <div class="filter-modal">
+            <button class="filter-close" id="filterClose">✕</button>
+            <div class="filter-header">
+                <h2>Filter Students</h2>
+            </div>
+
+            <div class="filter-group">
+                <div class="filter-group-title">Grade Level</div>
+                <div class="filter-chips-row" id="gradeFilters">
+                    <span class="filter-chip active" data-type="grade" data-value="all">All</span>
+                    <span class="filter-chip" data-type="grade" data-value="Kinder">Kinder</span>
+                    <span class="filter-chip" data-type="grade" data-value="Grade 1">Grade 1</span>
+                    <span class="filter-chip" data-type="grade" data-value="Grade 2">Grade 2</span>
+                    <span class="filter-chip" data-type="grade" data-value="Grade 3">Grade 3</span>
+                    <span class="filter-chip" data-type="grade" data-value="Grade 4">Grade 4</span>
+                    <span class="filter-chip" data-type="grade" data-value="Grade 5">Grade 5</span>
+                    <span class="filter-chip" data-type="grade" data-value="Grade 6">Grade 6</span>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <div class="filter-group-title">Section</div>
+                <div class="filter-chips-row" id="sectionFilters">
+                    <span class="filter-chip active" data-type="section" data-value="all">All</span>
+                    <span class="filter-chip" data-type="section" data-value="MAGSAYSAY">Magsaysay</span>
+                    <span class="filter-chip" data-type="section" data-value="AGUINALDO">Aguinaldo</span>
+                    <span class="filter-chip" data-type="section" data-value="RIZAL">Rizal</span>
+                    <span class="filter-chip" data-type="section" data-value="BONIFACIO">Bonifacio</span>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <div class="filter-group-title">Enrollment Progress</div>
+                <div class="filter-chips-row" id="statusFilters">
+                    <span class="filter-chip active" data-type="status" data-value="all">All</span>
+                    <span class="filter-chip" data-type="status" data-value="Enrolling">Enrolling</span>
+                    <span class="filter-chip" data-type="status" data-value="Enrolled">Enrolled</span>
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button class="filter-clear" id="filterClear">Clear All</button>
+                <button class="filter-apply" id="filterApply">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Viewer Overlay -->
+    <div class="image-overlay" id="imageOverlay">
+        <div class="image-modal">
+            <button class="image-close" id="imageClose">✕</button>
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Crect width='800' height='600' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial%2C sans-serif' font-size='32' fill='%231d3461'%3EDocument Placeholder%3C/text%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial%2C sans-serif' font-size='16' fill='%235a7ab5'%3ENo scanned document available%3C/text%3E%3C/svg%3E" alt="Document Placeholder">
+        </div>
+    </div>
+
+    <script>
+      const SUPABASE_URL = 'https://fmwrnjayxjzbohqfbawj.supabase.co';
+      const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtd3JuamF5eGp6Ym9ocWZiYXdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzY3MjUsImV4cCI6MjA5NzQxMjcyNX0.n5GAYgAcqDyB8OwHgoSQhoxv8_r1UbGf1qC45TGNn_s';
+      const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    </script>
+    <script src="admin_page.js"></script>
+</body>
+</html>
