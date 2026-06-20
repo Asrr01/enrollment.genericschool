@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enrollment Status — Generic School</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header>
+    <a href="index.html" class="logo-link">
+      <svg class="school-seal" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="48" fill="#142341"/>
+        <circle cx="50" cy="50" r="47" fill="none" stroke="#f0c840" stroke-width="2.5"/>
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#f0c840" stroke-width="1"/>
+        <rect x="32" y="33" width="16" height="23" rx="2" fill="#f0c840"/>
+        <rect x="52" y="33" width="16" height="23" rx="2" fill="#c8a200"/>
+        <rect x="47" y="33" width="6" height="23" fill="#142341"/>
+        <text x="50" y="24" text-anchor="middle" fill="#f0c840" font-size="7" font-family="Arial">✦ ✦ ✦</text>
+        <text x="50" y="81" text-anchor="middle" fill="#f0c840" font-size="5.5" font-family="Arial" letter-spacing="0.5">GENERIC SCHOOL</text>
+      </svg>
+      <div class="school-name">
+        <h1>Generic School</h1>
+        <p>Generic School Name or Generic Description</p>
+      </div>
+    </a>
+
+    <nav class="main-nav">
+      <div class="nav-item">
+        <button class="nav-dropbtn">About ▾</button>
+        <div class="dropdown-menu">
+          <a href="history.html">History</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="enroll.html" class="nav-link">Log In</a>
+    </nav>
+  </header>
+
+  <!-- ============ PROGRESS PAGE ============ -->
+  <div class="progress-bg">
+
+    <h2 class="progress-heading" id="progressHeading">
+      Your Enrollment Is<br>Currently In Process
+    </h2>
+    <div id="lrnPrompt" style="display:none; text-align:center; margin-bottom:20px;">
+      <input type="text" id="lrnInput" placeholder="Enter your LRN" style="padding:10px; border-radius:5px; border:1px solid #ccc;">
+      <button onclick="checkLRN()" class="submit-btn" style="padding:10px 20px; width:auto;">Check Status</button>
+    </div>
+
+    <!-- Phase Tracker -->
+    <div class="phase-tracker">
+      <div class="phase-node">
+        <div class="phase-circle done"></div>
+        <span class="phase-lbl done">First phase</span>
+      </div>
+
+      <div class="phase-line done"></div>
+
+      <div class="phase-node">
+        <div class="phase-circle"></div>
+        <span class="phase-lbl">Second phase</span>
+      </div>
+
+      <div class="phase-line"></div>
+
+      <div class="phase-node">
+        <div class="phase-circle"></div>
+        <span class="phase-lbl">Third phase</span>
+      </div>
+
+      <div class="phase-line"></div>
+
+      <div class="phase-node">
+        <div class="phase-circle"></div>
+        <span class="phase-lbl">Fourth phase</span>
+      </div>
+
+      <div class="phase-line"></div>
+
+      <div class="phase-node">
+        <div class="phase-circle"></div>
+        <span class="phase-lbl">Fifth phase</span>
+      </div>
+    </div>
+
+    <!-- Status Card -->
+    <div class="status-card">
+      <p class="status-label">Status:</p>
+      <div class="status-item">
+        <div class="check-box">&#10003;</div>
+        <div class="status-text">
+          <h4>Form Submitted</h4>
+          <p>Please wait for further updates</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end progress-bg -->
+
+  <script>
+    const SUPABASE_URL = 'https://fmwrnjayxjzbohqfbawj.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtd3JuamF5eGp6Ym9ocWZiYXdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MzY3MjUsImV4cCI6MjA5NzQxMjcyNX0.n5GAYgAcqDyB8OwHgoSQhoxv8_r1UbGf1qC45TGNn_s';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let phaseNames = [];
+    let phaseDesc = [];
+
+    function checkLRN() {
+      const lrn = document.getElementById('lrnInput').value.trim();
+      if (lrn) window.location.href = `progress.html?lrn=${lrn}`;
+    }
+
+    async function loadProgress() {
+      const params = new URLSearchParams(window.location.search);
+      const lrn = params.get('lrn');
+
+      if (!lrn) {
+        document.getElementById('progressHeading').innerHTML = "Check Your<br>Enrollment Status";
+        document.getElementById('lrnPrompt').style.display = 'block';
+        document.querySelector('.phase-tracker').style.display = 'none';
+        document.querySelector('.status-card').style.display = 'none';
+        return;
+      }
+
+      try {
+        // Fetch Phase Definitions
+        const { data: phasesData } = await supabase.from('enrollment_phases').select('*').order('phase_order', { ascending: true });
+        if (phasesData) {
+          phaseNames = phasesData.map(p => p.phase_name);
+          phaseDesc = phasesData.map(p => p.phase_desc);
+        }
+        const { data, error } = await supabase
+          .from('students')
+          .select('current_phase, first_name, last_name')
+          .eq('lrn', lrn)
+          .order('submitted_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (error || !data) {
+          document.getElementById('progressHeading').innerHTML = "No Record Found<br>For This LRN";
+          document.querySelector('.phase-tracker').style.display = 'none';
+          document.querySelector('.status-card').style.display = 'none';
+          document.getElementById('lrnPrompt').style.display = 'block';
+          return;
+        }
+
+        const currentPhase = data.current_phase || 1;
+        document.getElementById('progressHeading').innerHTML = `Enrollment Status For<br>${data.first_name} ${data.last_name}`;
+
+        // Update Tracker
+        const nodes = document.querySelectorAll('.phase-node');
+        const lines = document.querySelectorAll('.phase-line');
+
+        // Update Tracker UI labels dynamically if available
+        nodes.forEach((node, i) => {
+          const circle = node.querySelector('.phase-circle');
+          const lbl = node.querySelector('.phase-lbl');
+          
+          if (phaseNames[i]) {
+            lbl.textContent = phaseNames[i];
+          }
+
+          if (i < currentPhase) {
+            circle.classList.add('done');
+            lbl.classList.add('done');
+          } else {
+            circle.classList.remove('done');
+            lbl.classList.remove('done');
+          }
+        });
+
+        lines.forEach((line, i) => {
+          if (i < currentPhase - 1) {
+            line.classList.add('done');
+          } else {
+            line.classList.remove('done');
+          }
+        });
+
+        // Update Status Card
+        document.querySelector('.status-text h4').textContent = phaseNames[currentPhase - 1] || "Unknown Phase";
+        document.querySelector('.status-text p').textContent = phaseDesc[currentPhase - 1] || "";
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    loadProgress();
+  </script>
+</body>
+</html>
+
